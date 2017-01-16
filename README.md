@@ -22,5 +22,6 @@ Displays files and provides download links for each file that expire.
 
 4. Run the app with `puma`
 
+5. To restrict people, create the file `acl.txt` and place the emails of the people you want to allow. Add one email per line. Then place the file in the S3 bucket you want to protect. 
 
 In production, set the environment variables on your server.
