@@ -1,0 +1,13 @@
+<h1><%= @data[:key] %></h1>
+
+<section class="buttons">
+  <a href="<%= @data[:url] %>">Download</a>
+</section>
+
+<% if @data[:content_type].include? "video" %>
+  <section class="player">
+    <video controls>
+      <source src="<%= @data[:url] %>" type="<%= @data[:content_type] %>">
+    </video>
+  </section>
+<% end %>
