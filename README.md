@@ -11,6 +11,7 @@ Displays files and provides download links for each file that expire.
 3. Create a `.env` file with the following contents:
 
     ```
+    S3SERVER_SECRET_KEY=your_own_made_up_secret_key_for_cookies
     GOOGLE_ID=your_app_id
     GOOGLE_SECRET=your_google_secret
     S3_BUCKET=your_bucket

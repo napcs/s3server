@@ -1,3 +1,7 @@
+
 <ul>
-  <li><a href="/o/<%= @object.key} %>"><%= object.key %></a></li>
+  <% @data.each do |object|  %>
+    <li><a href="/o/<%= object.key %>"><%= object.key %></a></li>
+  <% end %>
 </ul>
+

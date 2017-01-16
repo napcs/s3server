@@ -4,6 +4,6 @@ gem 'aws-sdk'
 
 gem 'rack-test', :groups => [:development, :test]
 
-gem 'omniauth'
+gem 'omniauth-google-oauth2'
 gem 'dotenv-rails', :groups => [:development, :test]
 gem 'puma'
