@@ -1,7 +1,6 @@
 require 'sinatra/base'
 require 'aws-sdk'
 require 'dotenv/load'
-require 'active_support'
 
 require_relative "lib/s3"
 
