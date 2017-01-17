@@ -6,14 +6,11 @@ WORKDIR /tmp
 ADD Gemfile Gemfile
 ADD Gemfile.lock Gemfile.lock
 RUN bundle install
-# Install gems
 
+# make app folder and copy over the app
 RUN mkdir /app
 WORKDIR /app
-
-# Upload source
 COPY . /app
-
 
 # Start server
 EXPOSE 9292
