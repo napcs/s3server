@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>S3Server</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+
+    <div class="container">
+
+      <header>
+        <section class="banner">
+          <h1>S3Server</h1>
+        </section>
+        <section class="login">
+          <img height="16" width="16" alt="Google" src="<%= session[:info][:picture] %>">
+          <%= session[:info][:name] %>
+        </section>
+      </header>
+
+      <main role="main">
+        <%= yield %>
+      </main>
+
+      <footer>
+        <small>S3Server developed by Brian Hogan</small>
+
+      </footer>
+
+    </div>
+
+  </body>
+</html>
