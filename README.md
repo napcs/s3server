@@ -9,7 +9,7 @@ When a user visits the app, they are redirected to log in with their Google acco
 
 ## Limitations
 
-Currently, this server only handles a single bucket's contents up to 1000 elements, and cannot support folders within a bucket. This is designed to quickly share a specific set of resources quickly.
+Currently, this server only handles a single bucket's contents up to 1000 elements, and cannot support folders within a bucket. This is designed to share a specific set of resources quickly.
 
 ## Requirements
 
