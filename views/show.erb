@@ -1,4 +1,7 @@
-<h1><%= @data[:key] %></h1>
+<h1><%= @data[:name] %></h1>
+
+<p>Type: <%= @data[:content_type] %></p>
+
 
 <section class="buttons">
   <a href="<%= @data[:url] %>">Download</a>
@@ -7,6 +10,14 @@
 <% if @data[:content_type].include? "video" %>
   <section class="player">
     <video controls>
+      <source src="<%= @data[:url] %>" type="<%= @data[:content_type] %>">
+    </video>
+  </section>
+<% end %>
+
+<% if @data[:content_type].include? "audio" %>
+  <section class="player">
+    <audio controls>
       <source src="<%= @data[:url] %>" type="<%= @data[:content_type] %>">
     </video>
   </section>

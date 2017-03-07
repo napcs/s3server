@@ -20,16 +20,33 @@ class S3Server < Sinatra::Base
     provider :google_oauth2, ENV["GOOGLE_ID"], ENV['GOOGLE_SECRET']
   end
 
-  get "/" do
-    redirect "/auth/google_oauth2" unless session[:authenticated]
+  get "/login" do
+    if ENV["GOOGLE_ID"]
+      redirect "/auth/google_oauth2"
+    else
+      auth = Rack::Auth::Basic::Request.new(request.env)
 
+      if auth.provided? and auth.basic? and auth.credentials and can_access_bucket_with_password?(auth.credentials.first, auth.credentials.last)
+        session[:authenticated] = true
+        session[:info] = {email: auth.credentials.first, picture: "", name: auth.credentials.first}
+        redirect "/"
+      else
+        headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
+        halt 401, "Not authorized\n"
+      end
+    end
+
+  end
+
+  get "/" do
+    redirect "/login" unless session[:authenticated]
     s3 = S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"]
     @data = s3.get_all_objects
     erb :index
   end
 
   get "/o/:key" do
-    redirect "/auth/google_oauth2" unless session[:authenticated]
+    redirect "/login" unless session[:authenticated]
     s3 = S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"]
     @data = s3.get_object_data_by_key(params[:key], ENV["S3_LINK_TIMEOUT"])
     erb :show
@@ -42,8 +59,7 @@ class S3Server < Sinatra::Base
   get '/auth/google_oauth2/callback' do
     auth = request.env['omniauth.auth']
     email = auth.info.email
-    s3 = S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"]
-    if s3.can_read?(email)
+    if can_access_bucket?(email)
       session[:authenticated] = true
       session[:info] = {email: auth.info.email, picture: auth.info.image, name: auth.info.name}
       redirect "/"
@@ -56,6 +72,16 @@ class S3Server < Sinatra::Base
   get "/logout" do
     session.clear
     "Logged out."
+  end
+
+  def can_access_bucket?(email)
+    s3 = S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"]
+    s3.can_read?(email)
+  end
+
+  def can_access_bucket_with_password?(email, password)
+    s3 = S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"]
+    s3.can_read_with_password?(email, password)
   end
 
   # start the server if ruby file executed directly

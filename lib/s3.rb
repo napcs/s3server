@@ -15,10 +15,34 @@ class S3
   #   s3.can_read? "homer@springfield.com"
   #   => false
   def can_read?(email)
-    s3 = Aws::S3::Client.new(region: 'us-west-2' )
-    resp = s3.get_object(bucket: @bucket, key: "acl.txt")
-    acl = resp.body.read.split("\n")
     acl.include?(email)
+  end
+
+  # Uses the `acl.txt` file in the bucket to see who has access.
+  # Called by basic auth.
+  # The `acl.txt` file should have a user and password in the format
+  #
+  #     homer@example.com:12345
+  #
+  # Usage:
+  #   s3.can_read_with_password? "homer@springfield.com", "12345"
+  #   => false
+  def can_read_with_password?(email, password)
+    acl.detect do |a|
+      entry = a.split(":")
+      entry.first == email && entry.last == password
+    end
+  end
+
+  def acl
+    s3 = Aws::S3::Client.new(region: @region)
+    begin
+      resp = s3.get_object(bucket: @bucket, key: "acl.txt")
+      resp.body.read.split("\n")
+    rescue Aws::S3::Errors::NoSuchKey
+      []
+    end
+
   end
 
   # retrieves all objects in the bucket except our acl.txt file.

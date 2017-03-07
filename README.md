@@ -14,11 +14,37 @@ Currently, this server only handles a single bucket's contents up to 1000 elemen
 ## Requirements
 
 1. An S3 bucket with credentials.
-2. A Google account with credentials
+2. (Optional) A Google account with credentials
 
 ## Configration
 
-Identify the S3 bucket you want to use. Ensure you have the ID and access key for the bucket.
+You can use password authentication or Google authentication to allow access to your bucket.
+
+In both cases, first identify the S3 bucket and region you want to use. Ensure you have the ID and access key for the bucket before proceeding.
+
+### Configuring for Password Authentication
+
+Create the file `acl.txt` and place the username and password of each person you want to allow in the format `username:password`.
+
+Add one set of credentials per line. Then place the file in the S3 bucket with the rest of the files.
+
+Create a `.env` file in the root of the app with the following contents:
+
+```
+RACK_ENV=development
+S3SERVER_SECRET_KEY=your_own_made_up_secret_key_for_cookies
+S3_BUCKET=your_bucket
+S3_ID=your_app_id
+S3_KEY=your_key
+S3_LINK_TIMEOUT=5
+S3_REGION=us-west-2
+```
+
+Run the app with `foreman start` to test it out.
+
+### Configuring for Google Authentication
+
+Google authentication involves using only email addresses in the `acl.txt` file, and supplying two additional environment variables.
 
 Create the file `acl.txt` and place the emails of the people you want to allow. Add one email per line. Then place the file in the S3 bucket with the rest of the files.
 
@@ -44,6 +70,7 @@ This file should **never be checked in to version control.**
 
 Run the app with `foreman start` to test it out.
 
+
 ## Production
 
 In production, create a `.env` file on your server just like the one in development mode, but then change `RACK_ENV` to `production`.
@@ -60,13 +87,31 @@ See the foreman documentation for [instructions on exporting to Systemd unit fil
 
 ## Running with Docker
 
-Build:
+You may want to run this server in a container instead. There's a Dockerfile included in the repository.
+
+Build the image:
 
 ```
 docker build -t napcs/s3server .
 ```
 
 Then run the container, passing it the environment variables you wish to use.
+
+If using password authentication, run the container like this:
+
+```
+docker run -d -p 9292:9292 --name s3server \
+-e RACK_ENV=production \
+-e S3SERVER_SECRET_KEY=your_own_made_up_secret_key_for_cookies \
+-e S3_BUCKET=your_bucket \
+-e S3_ID=your_app_id \
+-e S3_KEY=your_key \
+-e S3_LINK_TIMEOUT=5 \
+-e S3_REGION=us-west-2 \
+napcs/s3server
+```
+
+If using Google authentication, run the container like this:
 
 ```
 docker run -d -p 9292:9292 --name s3server \
@@ -82,18 +127,18 @@ docker run -d -p 9292:9292 --name s3server \
 napcs/s3server
 ```
 
-Stop it with
+
+Stop the container with
 
 ```
 docker stop s3server
 ```
 
-Restart with
+Restart the container later with
 
 ```
 docker start s3server
 ```
-
 
 To clean everything up, remove the container with
 
@@ -107,6 +152,15 @@ and remove the image with
 docker rmi napcs/s3server
 ```
 
+## Changelog
+
+* 2017-03-07
+    * [Bugfix] Name of file was not displaying.
+    * [Bugfix] US-West region was hardcoded in the ACL lookup.
+    * [Feature] Added support for password logins with HTTP Basic Auth.
+    * [Feature] Added HTML audio support for audio files.
+* 2017-01-16 
+    * Initial release with Google auth and Docker support.
 
 ## License
 
