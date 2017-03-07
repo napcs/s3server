@@ -1,11 +1,16 @@
 # S3Server
 
-Simple file server providing restricted access to an S3 bucket's files. 
-Displays files and provides download links for each file that expire.
+Simple file server providing restricted access to an S3 bucket's files.  Displays files and provides download links for each file that expire.
 
 ## How it works
 
-When a user visits the app, they are redirected to log in with their Google account. Once logged in, the application looks for a file in the S3 bucket called `acl.txt` for the email of the logged in user. If their email exists in the file, they get in. This eliminates the requirement for a database and makes sharing a bucket of files simple.
+When a user visits the app, they are redirected to log in, either with their Google account, or a username and password, depending on the configuration. 
+
+If the app is configured to use Google logins, then, once logged in, the application looks for a file in the S3 bucket called `acl.txt` for the email of the logged in user. If their email exists in the file, they get in. 
+
+If using passwords, the server checks the `acl.txt` file in the bucket for the credentials passed in by the user.
+
+The ACL file eliminates the requirement for a database and makes sharing a bucket of files simple.
 
 ## Limitations
 
