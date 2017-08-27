@@ -7,6 +7,12 @@ body {
   width: 98%;
 }
 
+@media (min-width: 1400px) {
+  .container {
+    width: 60%;
+  }
+}
+
 header {
   background-color: #333;
   color: #fff;
@@ -31,4 +37,4 @@ header .login {
   width: 50%;
 }
 
-video { width: 100% }
+video, audio { width: 100% }

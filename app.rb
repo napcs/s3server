@@ -21,34 +21,41 @@ class S3Server < Sinatra::Base
   end
 
   get "/login" do
-    if ENV["GOOGLE_ID"]
-      redirect "/auth/google_oauth2"
-    else
-      auth = Rack::Auth::Basic::Request.new(request.env)
+    auth = Rack::Auth::Basic::Request.new(request.env)
 
-      if auth.provided? and auth.basic? and auth.credentials and can_access_bucket_with_password?(auth.credentials.first, auth.credentials.last)
-        session[:authenticated] = true
-        session[:info] = {email: auth.credentials.first, picture: "", name: auth.credentials.first}
-        redirect "/"
+    if auth.provided? and auth.basic? and auth.credentials and can_access_bucket_with_password?(auth.credentials.first, auth.credentials.last)
+      session[:authenticated] = true
+      session[:info] = {email: auth.credentials.first, picture: "", name: auth.credentials.first}
+      redirect "/"
+    else
+      headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
+      halt 401, "Not authorized\n"
+    end
+  end
+
+  def login_check
+    unless ENV["S3SERVER_LOGIN"] == "none"
+      return if session[:authenticated]
+      if ENV["S3SERVER_LOGIN"] == "google"
+        redirect "/auth/google_oauth2"
       else
-        headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
-        halt 401, "Not authorized\n"
+        redirect "/login"
       end
     end
-
   end
 
   get "/" do
-    redirect "/login" unless session[:authenticated]
+    login_check
     s3 = S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"]
     @data = s3.get_all_objects
     erb :index
   end
 
-  get "/o/:key" do
-    redirect "/login" unless session[:authenticated]
+  get "/o/*" do
+    login_check
+    key = params[:splat].first
     s3 = S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"]
-    @data = s3.get_object_data_by_key(params[:key], ENV["S3_LINK_TIMEOUT"])
+    @data = s3.get_object_data_by_key(key, ENV["S3_LINK_TIMEOUT"])
     erb :show
   end
 

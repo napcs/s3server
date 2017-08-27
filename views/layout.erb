@@ -14,10 +14,12 @@
         <section class="banner">
           <h1>S3Server</h1>
         </section>
-        <section class="login">
-          <img height="16" width="16" alt="Google" src="<%= session[:info][:picture] %>">
-          <%= session[:info][:name] %>
-        </section>
+        <% if session[:info] %>
+          <section class="login">
+            <img height="16" width="16" alt="Google" src="<%= session[:info][:picture] %>">
+            <%= session[:info][:name] %>
+          </section>
+        <% end %>
       </header>
 
       <main role="main">
