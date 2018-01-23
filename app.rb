@@ -10,6 +10,7 @@ require_relative "lib/s3"
 
 
 class S3Server < Sinatra::Base
+  VERSION = 0.4
   configure :development do
     register Sinatra::Reloader
   end
@@ -25,7 +26,7 @@ class S3Server < Sinatra::Base
 
     if auth.provided? and auth.basic? and auth.credentials and can_access_bucket_with_password?(auth.credentials.first, auth.credentials.last)
       session[:authenticated] = true
-      session[:info] = {email: auth.credentials.first, picture: "", name: auth.credentials.first}
+      session[:info] = {name: auth.credentials.first}
       redirect "/"
     else
       headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
@@ -44,9 +45,13 @@ class S3Server < Sinatra::Base
     end
   end
 
+  def get_s3_connection
+    S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"], ENV["S3_ENDPOINT"]
+  end
+
   get "/" do
     login_check
-    s3 = S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"]
+    s3 = get_s3_connection
     @data = s3.get_all_objects
     erb :index
   end
@@ -54,7 +59,7 @@ class S3Server < Sinatra::Base
   get "/o/*" do
     login_check
     key = params[:splat].first
-    s3 = S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"]
+    s3 = get_s3_connection
     @data = s3.get_object_data_by_key(key, ENV["S3_LINK_TIMEOUT"])
     erb :show
   end
@@ -82,12 +87,12 @@ class S3Server < Sinatra::Base
   end
 
   def can_access_bucket?(email)
-    s3 = S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"]
+    s3 = get_s3_connection
     s3.can_read?(email)
   end
 
   def can_access_bucket_with_password?(email, password)
-    s3 = S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"]
+    s3 = get_s3_connection
     s3.can_read_with_password?(email, password)
   end
 

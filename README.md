@@ -201,7 +201,33 @@ and remove the image with
 docker rmi napcs/s3server
 ```
 
+## Support for DigitalOcean Spaces
+
+[DigitalOcean Spaces](https://spaces.digitalocean.com) is DigitalOcean's object storage system. It's compatible with S3.
+
+To use it with S3Server, specify the `S3_ENDPOINT` to `https://[region].digitaloceanspaces.com` where `[region]` is the region you're using.
+
+The `S3_BUCKET` is the name of your Space.
+
+For a bucket called `s3test` in the `nyc3` region, the environment variables look like this:
+
+```
+S3_ENDPOINT=https://nyc3.digitaloceanspaces.com
+S3_REGION=nyc3
+S3_BUCKET=s3test
+S3_ID=your_spaces_key
+S3_KEY=your_spaces_secret
+S3_LINK_TIMEOUT=5
+S3SERVER_LOGIN=password
+```
+
+Once the server is configured, start it and use DigitalOcean Spaces as your backend.
+
 ## Changelog
+
+* 2018-01-22 (0.4)
+    * Add support to override the endpoint in order to support DigitalOcean Spaces
+    * Tested with DigitalOcean Spaces
 
 * 2017-08-27 (0.3)
     * Breaking change:

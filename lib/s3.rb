@@ -1,14 +1,19 @@
 # Wrapper for the logic behind the S3 service.
 class S3
 
-  # Create an instance using the id, key, bucket, and region.
-  def initialize(id, key, bucket, region)
+  # Create an instance using the id, key, bucket, region, and optional endpoint
+  def initialize(id, key, bucket, region, endpoint=nil)
     @id = id
     @key = key
     @bucket = bucket
     @region = region
     # TODO: fix this - pass creds directly.
     Aws.config[:credentials] = Aws::Credentials.new(@id, @key)
+    Aws.config[:region] = @region
+    if endpoint
+      Aws.config[:endpoint] = endpoint
+    end
+
   end
 
   # Uses the `acl.txt` file in the bucket to see who has access.
@@ -35,10 +40,12 @@ class S3
   end
 
   def acl
-    s3 = Aws::S3::Client.new(region: @region)
+    s3 = Aws::S3::Client.new
     begin
       resp = s3.get_object(bucket: @bucket, key: "acl.txt")
       resp.body.read.split("\n")
+    #rescue Aws::S3::Errors::NoSuchBucket
+    #  []
     rescue Aws::S3::Errors::NoSuchKey
       []
     end
@@ -47,7 +54,7 @@ class S3
 
   # retrieves all objects in the bucket except our acl.txt file.
   def get_all_objects
-    s3 = Aws::S3::Resource.new(region: @region )
+    s3 = Aws::S3::Resource.new
     bucket = s3.bucket(@bucket)
     bucket.objects.reject{|o| o.key == "acl.txt"}
   end
@@ -59,7 +66,7 @@ class S3
   #     name: the object's name (the key)
   #   }
   def get_object_data_by_key(key, timeout)
-    s3 = Aws::S3::Resource.new(region: @region )
+    s3 = Aws::S3::Resource.new
     bucket = s3.bucket(@bucket)
     object = bucket.object(key)
     timeout = timeout.to_i
