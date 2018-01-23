@@ -10,7 +10,7 @@ require_relative "lib/s3"
 
 
 class S3Server < Sinatra::Base
-  VERSION = 0.4
+  VERSION = 0.4.1
   configure :development do
     register Sinatra::Reloader
   end

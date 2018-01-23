@@ -14,18 +14,20 @@ The ACL file eliminates the requirement for a database and makes sharing a bucke
 
 ## Limitations
 
-Currently, this server only handles a single bucket's contents up to 1000 elements, and cannot support folders within a bucket. This is designed to share a specific set of resources quickly.
+Currently, this server only handles a single bucket's contents up to 1000 elements, and cannot support "folders" within a bucket since those aren't really things anyway. This is designed to share a specific set of resources quickly.
 
 ## Requirements
 
-1. An S3 bucket with credentials.
+1. An S3 bucket with credentials or a compatible service like DigitalOcean Spaces (See the section later in this README for configuring Spaces.
 2. (Optional) A Google account with credentials
 
-## Configration
+## Configuration
 
 You can use password authentication or Google authentication to allow access to your bucket.
 
-In both cases, first identify the S3 bucket and region you want to use. Ensure you have the ID and access key for the bucket before proceeding.
+In both cases, first identify the bucket and region you want to use. Ensure you have the ID and access key for the bucket before proceeding.
+
+The server launches on port `9292` by default. You can override this.
 
 ### Configuring for Password Authentication
 
@@ -44,6 +46,7 @@ S3_KEY=your_key
 S3_LINK_TIMEOUT=5
 S3_REGION=us-west-2
 S3SERVER_LOGIN=password
+S3SERVER_PORT=9292
 ```
 
 Run the app with `foreman start` to test it out.
@@ -71,13 +74,14 @@ S3_REGION=us-west-2
 S3SERVER_LOGIN=google
 GOOGLE_ID=your_app_id
 GOOGLE_SECRET=your_google_secret
+S3SERVER_PORT=9292
 ```
 
 This file should **never be checked in to version control.**
 
 Run the app with `foreman start` to test it out.
 
-## Anonymous acces
+## Anonymous access
 
 So you want anyone anywhere to be able to grab files from your bucket?
 
@@ -96,6 +100,7 @@ S3_KEY=your_key
 S3_LINK_TIMEOUT=5
 S3_REGION=us-west-2
 S3SERVER_LOGIN=none
+S3SERVER_PORT=9292
 ```
 
 That's it. Fire it up with `foreman start` to test things out.
@@ -118,12 +123,10 @@ Probably should put this behind Nginx with a Let's Encrypt certificate too.
 
 ## Running with Docker
 
-You may want to run this server in a container instead. There's a Dockerfile included in the repository.
-
-Build the image:
+You may want to run this server in a container instead. There's a Dockerfile included in the repository if you want to build your own image. Alternatively, you can get the pre-built image from Docker Hub.
 
 ```
-docker build -t napcs/s3server .
+docker pull napcs/s3server
 ```
 
 Then run the container, passing it the environment variables you wish to use.
@@ -140,6 +143,7 @@ docker run -d -p 9292:9292 --name s3server \
 -e S3_LINK_TIMEOUT=5 \
 -e S3_REGION=us-west-2 \
 -e S3SERVER_LOGIN=password \
+-e S3SERVER_PORT=9292 \
 napcs/s3server
 ```
 
@@ -155,6 +159,7 @@ docker run -d -p 9292:9292 --name s3server \
 -e S3_LINK_TIMEOUT=5 \
 -e S3_REGION=us-west-2 \
 -e S3SERVER_LOGIN=google \
+-e S3SERVER_PORT=9292 \
 -e GOOGLE_ID=your_app_id \
 -e GOOGLE_SECRET=your_google_secret \
 napcs/s3server
@@ -172,10 +177,12 @@ docker run -d -p 9292:9292 --name s3server \
 -e S3_LINK_TIMEOUT=5 \
 -e S3_REGION=us-west-2 \
 -e S3SERVER_LOGIN=none \
+-e S3SERVER_PORT=9292 \
 napcs/s3server
 ```
 
 And you're good to go.
+
 
 Stop the container with
 
@@ -201,6 +208,14 @@ and remove the image with
 docker rmi napcs/s3server
 ```
 
+You can build your own image with
+
+```
+docker build -t s3server .
+```
+
+And just use that instead of the one from Docker Hub. 
+
 ## Support for DigitalOcean Spaces
 
 [DigitalOcean Spaces](https://spaces.digitalocean.com) is DigitalOcean's object storage system. It's compatible with S3.
@@ -219,11 +234,53 @@ S3_ID=your_spaces_key
 S3_KEY=your_spaces_secret
 S3_LINK_TIMEOUT=5
 S3SERVER_LOGIN=password
+S3SERVER_PORT=9292
 ```
 
-Once the server is configured, start it and use DigitalOcean Spaces as your backend.
+Once the server is configured, start it and it'll use DigitalOcean Spaces as your backend.
+
+## Nginx as a Reverse Proxy
+
+You might not want to expose this to the web. And if you're gonna take passwords through it,, probably best to use HTTPS. 
+
+Nginx is a nice quick way to pull this off. 
+
+Get an Ubuntu 16.04 server. Install Nginx on it with 
+
+```
+sudo apt-get install nginx
+```
+
+Get yourself a domain name like `s3server.example.com` and point it at your box's IP address.
+
+Use this configuration to set up a reverse proxy with Nginx. Put it in `/etc/nginx/sites-available/s3server.conf`:
+
+```
+server {
+    listen 80;
+    listen [::]:80;
+    server_name s3server.example.com;
+
+		location / {
+			proxy_pass http://localhost:9292;
+			include /etc/nginx/proxy_params;
+		}
+}
+``` 
+
+Symlink it:
+
+```
+sudo ln -nfs /etc/nginx/sites-available/s3server.conf /etc/nginx/sites-enabled/s3server.conf
+```
+
+Then use Certbot to get a Let's Encrypt certificate for this and redirect all traffic from HTTP to HTTPS. Visit `https://s3server.example.com` and you're golden.
 
 ## Changelog
+
+* 2018-01-23 (0.4.1)
+    * Added support for port
+    * Pushed image to Docker Hub
 
 * 2018-01-22 (0.4)
     * Add support to override the endpoint in order to support DigitalOcean Spaces
