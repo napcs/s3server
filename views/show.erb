@@ -1,7 +1,12 @@
 <h1><%= @data[:name] %></h1>
 
-<p>Type: <%= @data[:content_type] %></p>
-
+<p>Type:
+<% if @data[:content_type].nil? || @data[:content_type] == "" %>
+  Unknown - The storage backend doesn't know this content type.
+<% else %>
+  <%= @data[:content_type] %></p>
+<% end %>
+</p>
 
 <section class="buttons">
   <a href="<%= @data[:url] %>">Download</a>

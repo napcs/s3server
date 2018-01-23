@@ -228,6 +228,9 @@ Once the server is configured, start it and use DigitalOcean Spaces as your back
 * 2018-01-22 (0.4)
     * Add support to override the endpoint in order to support DigitalOcean Spaces
     * Tested with DigitalOcean Spaces
+    * Better support for unknown file types on the show page
+    * Fix broken image in header when using password logins
+    * Displays version in footer
 
 * 2017-08-27 (0.3)
     * Breaking change:
