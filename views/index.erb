@@ -1,7 +1,18 @@
 <h1>Files</h1>
-<ul>
-  <% @data.each do |object|  %>
-    <li><a href="/o/<%= object.key %>"><%= object.key %></a></li>
-  <% end %>
-</ul>
+<table>
+  <thead>
+    <tr>
+      <th>File</th>
+      <th>Size</th>
+    </th>
+  </thead>
+  <tbody>
+    <% @data.each do |object|  %>
+      <tr>
+        <td><a href="/o/<%= object.key %>"><%= object.key %></a></td>
+        <td><%= S3Server::Helpers.format_mb object.content_length %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
 

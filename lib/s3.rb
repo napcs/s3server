@@ -71,6 +71,11 @@ class S3
     object = bucket.object(key)
     timeout = timeout.to_i
     url = object.presigned_url(:get, { expires_in: (timeout * 60), secure: true })
-    {url: url, content_type: object.content_type, name: object.key}
+    { url: url,
+      content_type: object.content_type,
+      name: object.key,
+      content_length: object.content_length,
+      last_modified: object.last_modified
+    }
   end
 end

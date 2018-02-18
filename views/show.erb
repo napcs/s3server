@@ -1,15 +1,22 @@
 <h1><%= @data[:name] %></h1>
 
-<p>Type:
-<% if @data[:content_type].nil? || @data[:content_type] == "" %>
-  Unknown - The storage backend doesn't know this content type.
-<% else %>
-  <%= @data[:content_type] %></p>
-<% end %>
-</p>
+<table>
+  <tr>
+    <td>Size: <%= S3Server::Helpers.format_mb @data[:content_length] %></td>
+    <td>Last modified:  <%= @data[:last_modified] %></td>
+    <td>
+      Type:
+      <% if @data[:content_type].nil? || @data[:content_type] == "" %>
+        Unknown - The storage backend doesn't know this content type.
+      <% else %>
+        <%= @data[:content_type] %>
+      <% end %>
+    </td>
+</table>
+
 
 <section class="buttons">
-  <a href="<%= @data[:url] %>">Download</a>
+  <a href="<%= @data[:url] %>">Download File</a>
 </section>
 
 <% if @data[:content_type].include? "video" %>

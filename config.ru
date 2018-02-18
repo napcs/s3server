@@ -1,2 +1,2 @@
 require './app'
-run S3Server
+run S3Server::Server

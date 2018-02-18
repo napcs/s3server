@@ -18,8 +18,8 @@ Currently, this server only handles a single bucket's contents up to 1000 elemen
 
 ## Requirements
 
-1. An S3 bucket with credentials or a compatible service like DigitalOcean Spaces (See the section later in this README for configuring Spaces.
-2. (Optional) A Google account with credentials
+1. An S3 bucket or a compatible service like DigitalOcean Spaces (See the section later in this README for configuring Spaces.
+2. (Optional) A Google account with the ability to create an application.
 
 ## Configuration
 
@@ -278,6 +278,9 @@ Then use Certbot to get a Let's Encrypt certificate for this and redirect all tr
 
 ## Changelog
 
+* 2018-02-18 (0.5.0)
+    * UI changes. Now shows file sizes.
+    * Minor refactoring under the hood.
 * 2018-01-23 (0.4.1)
     * Added support for port
     * Pushed image to Docker Hub
