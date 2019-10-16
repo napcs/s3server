@@ -2,6 +2,7 @@ body {
   font-family: "Arial", "Helvetica", sans-serif;
 }
 
+
 .container {
   margin: 0 auto;
   width: 98%;
@@ -41,8 +42,8 @@ video, audio { width: 100% }
 
 table {
   border: 1px solid ddd;
-  display: table;
   width: 100%;
+  table-layout:fixed
 }
 
 table th {
@@ -52,9 +53,13 @@ table th {
   padding: 1em;
 }
 
+
+
 table td {
   border-bottom: 1px solid #ddd;
   padding: 1em;
+  word-wrap:break-word
+
 }
 
 table td a {
