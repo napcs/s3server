@@ -39,7 +39,7 @@ GEM
       oauth2 (~> 1.0)
       omniauth (~> 1.2)
     puma (3.4.0)
-    rack (1.6.5)
+    rack (1.6.11)
     rack-protection (1.5.3)
       rack
     rack-test (0.6.3)
