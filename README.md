@@ -277,7 +277,8 @@ sudo ln -nfs /etc/nginx/sites-available/s3server.conf /etc/nginx/sites-enabled/s
 Then use Certbot to get a Let's Encrypt certificate for this and redirect all traffic from HTTP to HTTPS. Visit `https://s3server.example.com` and you're golden.
 
 ## Changelog
-
+* 2019-10-16 (0.5.1)
+  * better mobile UI when filenames are long
 * 2018-02-18 (0.5.0)
     * UI changes. Now shows file sizes.
     * Minor refactoring under the hood.

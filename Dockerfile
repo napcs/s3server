@@ -3,8 +3,8 @@ MAINTAINER Brian Hogan <brianhogan@napcs.com>
 
 # Install gems
 WORKDIR /tmp
-ADD Gemfile Gemfile
-ADD Gemfile.lock Gemfile.lock
+COPY Gemfile Gemfile
+COPY Gemfile.lock Gemfile.lock
 RUN bundle install
 
 # make app folder and copy over the app

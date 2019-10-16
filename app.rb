@@ -1,5 +1,5 @@
 module S3Server
-  VERSION = "0.5.0"
+  VERSION = "0.5.1"
 
   require 'sinatra/base'
   require 'aws-sdk'
