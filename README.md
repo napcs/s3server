@@ -277,6 +277,11 @@ sudo ln -nfs /etc/nginx/sites-available/s3server.conf /etc/nginx/sites-enabled/s
 Then use Certbot to get a Let's Encrypt certificate for this and redirect all traffic from HTTP to HTTPS. Visit `https://s3server.example.com` and you're golden.
 
 ## Changelog
+* 2021-09-12 (0.6.0)
+  * Directories are no longer shown in the UI. Only the actual files are displayed, but their paths are still shown.
+  * Updated AWS dependency to use the AWS SDK
+  * Docker image uses Alpine, reducing the size of the image.
+
 * 2019-10-16 (0.5.1)
   * better mobile UI when filenames are long
 * 2018-02-18 (0.5.0)

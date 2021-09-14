@@ -4,14 +4,16 @@
     <tr>
       <th>File</th>
       <th>Size</th>
-    </th>
+    </tr>
   </thead>
   <tbody>
     <% @data.each do |object|  %>
-      <tr>
-        <td><a href="/o/<%= object.key %>"><%= object.key %></a></td>
-        <td><%= S3Server::Helpers.format_mb object.content_length %></td>
-      </tr>
+      <% if object.content_length > 0 %>
+        <tr>
+          <td><a href="/o/<%= object.key %>"><%= object.key %></a></td>
+          <td><%= S3Server::Helpers.format_mb object.content_length %></td>
+        </tr>
+      <% end %>
     <% end %>
   </tbody>
 </table>

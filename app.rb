@@ -1,8 +1,8 @@
 module S3Server
-  VERSION = "0.5.1"
+  VERSION = "0.6.2"
 
   require 'sinatra/base'
-  require 'aws-sdk'
+  require 'aws-sdk-s3'
   require 'dotenv/load'
   require 'omniauth-oauth2'
   require 'omniauth-google-oauth2'

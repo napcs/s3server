@@ -1,3 +1,7 @@
 .env
 .gitignore
 .git
+.acl.txt
+README.md
+run.sh
+
