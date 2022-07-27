@@ -1,4 +1,4 @@
-FROM ruby:2.6.0-alpine
+FROM ruby:2.6.9-alpine
 MAINTAINER Brian Hogan <brianhogan@napcs.com>
 
 run apk add --update ruby-dev build-base \
