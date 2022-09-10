@@ -299,6 +299,7 @@ Then use Certbot to get a Let's Encrypt certificate for this and redirect all tr
 
 ## Changelog
 * 2022-09-09 (0.7.0)
+  * Upgrade Puma and Sinatra to address security issues.
   * Upgrade Oauth for Google and add proper login and no access screens.
   * Add option to hide folders and only show the top folder of a bucket. 
 
