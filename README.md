@@ -298,8 +298,10 @@ sudo ln -nfs /etc/nginx/sites-available/s3server.conf /etc/nginx/sites-enabled/s
 Then use Certbot to get a Let's Encrypt certificate for this and redirect all traffic from HTTP to HTTPS. Visit `https://s3server.example.com` and you're golden.
 
 ## Changelog
-* 2022-09-09 (0.6.3)
+* 2022-09-09 (0.7.0)
+  * Upgrade Oauth for Google and add proper login and no access screens.
   * Add option to hide folders and only show the top folder of a bucket. 
+
 * 2021-09-12 (0.6.2)
   * Directories are no longer shown in the UI. Only the actual files are displayed, but their paths are still shown.
   * Updated AWS dependency to use the AWS SDK
