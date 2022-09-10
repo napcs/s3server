@@ -1,5 +1,5 @@
 module S3Server
-  VERSION = "0.6.3"
+  VERSION = "0.7.0"
 
   require 'sinatra/base'
   require 'aws-sdk-s3'
@@ -13,6 +13,10 @@ module S3Server
   require_relative "lib/helpers"
 
   class Server < Sinatra::Base
+    configure do
+      set :sessions, true if ENV["S3SERVER_LOGIN"] == "google"
+    end
+
     configure :development do
       register Sinatra::Reloader
     end
@@ -54,15 +58,15 @@ module S3Server
     end
 
     get "/fail" do
-      "You don't have access."
+      erb :fail
     end
 
     get '/auth/google_oauth2/callback' do
       auth = request.env['omniauth.auth']
       email = auth.info.email
+      session[:info] = {email: auth.info.email, picture: auth.info.image, name: auth.info.name}
       if can_access_bucket?(email)
         session[:authenticated] = true
-        session[:info] = {email: auth.info.email, picture: auth.info.image, name: auth.info.name}
         redirect "/"
       else
         redirect "/fail"
@@ -73,6 +77,12 @@ module S3Server
     get "/logout" do
       session.clear
       "Logged out."
+    end
+
+    # Shim because oauth2 requires a button press to make the logins
+    # work, and requires a CSRF token.
+    get "/auth/google_oauth2" do
+      erb :login
     end
 
     private
@@ -87,6 +97,7 @@ module S3Server
         end
       end
     end
+
 
     def get_s3_connection
       S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"], ENV["S3_ENDPOINT"]

@@ -1,0 +1,5 @@
+<h2>Log in</h2>
+<form method='post' action='/auth/google_oauth2'>
+  <input type="hidden" name="authenticity_token" value='<%=request.env["rack.session"]["csrf"] %>'>
+  <input type='submit' value='Log in with your Google account'>
+</form>
