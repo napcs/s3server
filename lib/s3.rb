@@ -53,10 +53,21 @@ class S3
   end
 
   # retrieves all objects in the bucket except our acl.txt file.
-  def get_all_objects
+  # options[:hide_folders] hides folders if true
+  def get_all_objects(options = {})
     s3 = Aws::S3::Resource.new
     bucket = s3.bucket(@bucket)
-    bucket.objects.reject{|o| o.key == "acl.txt"}
+
+    # remove ACL file from the list
+    objects = bucket.objects.reject { |o| o.key == "acl.txt" }
+
+    return objects unless options[:hide_folders]
+
+    # find folders. They'll be zero byte and the last char will be a /
+    folders = bucket.objects.select { |o| o.size == 0 && o.key[-1] == "/" }
+    # don't show objects in folders. There's no good way to recurse.
+    objects.reject { |o| folders.find { |f| o.key.include? f.key } }
+
   end
 
   # Get the object data from S3 by the key, returning the following hash:

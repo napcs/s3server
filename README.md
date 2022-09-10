@@ -47,7 +47,23 @@ S3_LINK_TIMEOUT=5
 S3_REGION=us-west-2
 S3SERVER_LOGIN=password
 S3SERVER_PORT=9292
+S3SERVER_HIDE_FOLDERS=true
 ```
+
+This file should **never be checked in to version control.**
+
+Here's what the options do:
+
+* `RACK_ENV` is `development` or `production`
+* `S3SERVER_SECRET_KEY` is some key you make yourself to use in securing the links.
+* `S3_BUCKET` is your bucket.
+* `S3_ID` is your AWS ID
+* `S3_KEY` is your AWS secret key
+* `S3_LINK_TIMEOUT` is how long in minutes the generated URLs are good for.
+* `S3_REGION` is the region for the bucket. Make sure this is correct.
+* `S3SERVER_LOGIN` is the login type. Can be `password`, `google`, or `none`
+* `S3SERVER_PORT` is the port this runs on.
+* `S3SERVER_HIDE_FOLDERS` (optional) lets you tell S3Server to only show the objects in the top level of the bucket. If this is not set, all files in all subfolders will appear on one page.
 
 Run the app with `foreman start` to test it out.
 
@@ -75,6 +91,7 @@ S3SERVER_LOGIN=google
 GOOGLE_ID=your_app_id
 GOOGLE_SECRET=your_google_secret
 S3SERVER_PORT=9292
+S3SERVER_HIDE_FOLDERS=true
 ```
 
 This file should **never be checked in to version control.**
@@ -101,6 +118,7 @@ S3_LINK_TIMEOUT=5
 S3_REGION=us-west-2
 S3SERVER_LOGIN=none
 S3SERVER_PORT=9292
+S3SERVER_HIDE_FOLDERS=true
 ```
 
 That's it. Fire it up with `foreman start` to test things out.
@@ -142,6 +160,7 @@ docker run -d -p 9292:9292 --name s3server \
 -e S3_KEY=your_key \
 -e S3_LINK_TIMEOUT=5 \
 -e S3_REGION=us-west-2 \
+-e S3SERVER_HIDE_FOLDERS=true \
 -e S3SERVER_LOGIN=password \
 -e S3SERVER_PORT=9292 \
 napcs/s3server
@@ -160,6 +179,7 @@ docker run -d -p 9292:9292 --name s3server \
 -e S3_REGION=us-west-2 \
 -e S3SERVER_LOGIN=google \
 -e S3SERVER_PORT=9292 \
+-e S3SERVER_HIDE_FOLDERS=true \
 -e GOOGLE_ID=your_app_id \
 -e GOOGLE_SECRET=your_google_secret \
 napcs/s3server
@@ -178,6 +198,7 @@ docker run -d -p 9292:9292 --name s3server \
 -e S3_REGION=us-west-2 \
 -e S3SERVER_LOGIN=none \
 -e S3SERVER_PORT=9292 \
+-e S3SERVER_HIDE_FOLDERS=true \
 napcs/s3server
 ```
 
@@ -277,7 +298,9 @@ sudo ln -nfs /etc/nginx/sites-available/s3server.conf /etc/nginx/sites-enabled/s
 Then use Certbot to get a Let's Encrypt certificate for this and redirect all traffic from HTTP to HTTPS. Visit `https://s3server.example.com` and you're golden.
 
 ## Changelog
-* 2021-09-12 (0.6.0)
+* 2022-09-09 (0.6.3)
+  * Add option to hide folders and only show the top folder of a bucket. 
+* 2021-09-12 (0.6.2)
   * Directories are no longer shown in the UI. Only the actual files are displayed, but their paths are still shown.
   * Updated AWS dependency to use the AWS SDK
   * Docker image uses Alpine, reducing the size of the image.

@@ -1,5 +1,5 @@
 module S3Server
-  VERSION = "0.6.2"
+  VERSION = "0.6.3"
 
   require 'sinatra/base'
   require 'aws-sdk-s3'
@@ -40,7 +40,8 @@ module S3Server
     get "/" do
       login_check
       s3 = get_s3_connection
-      @data = s3.get_all_objects
+      @data = s3.get_all_objects({hide_folders: ENV["S3SERVER_HIDE_FOLDERS"]})
+
       erb :index
     end
 
