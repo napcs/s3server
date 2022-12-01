@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
-gem 'sinatra', '~> 2.2'
-gem 'sinatra-contrib', '~> 2.2'
+gem 'sinatra', '~> 3.0'
+gem 'sinatra-contrib', '~> 3.0'
 gem 'aws-sdk-s3', '~> 1'
 
 gem 'rack-test', :groups => [:development, :test]
