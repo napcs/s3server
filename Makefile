@@ -1,5 +1,5 @@
 NAME   := napcs/s3server
-TAG    := 0.6.0
+TAG    := 0.7.0
 IMG    := ${NAME}:${TAG}
 LATEST := ${NAME}:latest
 
