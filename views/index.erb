@@ -7,14 +7,25 @@
     </tr>
   </thead>
   <tbody>
-    <% @data.each do |object|  %>
-      <% if object.content_length > 0 %>
+    <% @folders.each do |folder|  %>
+      <tr>
+        <td>
+          <a href="/o/<%= folder %>">📁</a>
+          <a href="/o/<%= folder %>"><%= folder %></a>
+        </td>
+        <td>Folder</td>
+      </tr>
+    <% end %>
+    <% @files.each do |object|  %>
+      <% if object[:content_length] > 0 %>
         <tr>
-          <td><a href="/o/<%= object.key %>"><%= object.key %></a></td>
-          <td><%= S3Server::Helpers.format_mb object.content_length %></td>
+          <td>
+            <a href="/o/<%= object[:key] %>?dl=1">🔽</a>
+            <span class="link"><a href="/o/<%= object[:key] %>"><%= object[:key] %></a></span>
+          </td>
+          <td><%= S3Server::Helpers.format_mb object[:content_length] %></td>
         </tr>
       <% end %>
     <% end %>
   </tbody>
 </table>
-

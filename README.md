@@ -1,12 +1,12 @@
 # S3Server
 
-Simple file server providing restricted access to an S3 bucket's files.  Displays files and provides download links for each file that expire.
+A file server providing restricted access to an S3 bucket's files. Displays files and provides download links for each file that expire.
 
 ## How it works
 
-When a user visits the app, they are redirected to log in, either with their Google account, or a username and password, depending on the configuration. 
+When a user visits the app, they are redirected to log in, either with their Google account, or a username and password, depending on the configuration.
 
-If the app is configured to use Google logins, then, once logged in, the application looks for a file in the S3 bucket called `acl.txt` for the email of the logged in user. If their email exists in the file, they get in. 
+If the app is configured to use Google logins, then, once logged in, the application looks for a file in the S3 bucket called `acl.txt` for the email of the logged in user. If their email exists in the file, they get in.
 
 If using passwords, the server checks the `acl.txt` file in the bucket for the credentials passed in by the user.
 
@@ -14,7 +14,9 @@ The ACL file eliminates the requirement for a database and makes sharing a bucke
 
 ## Limitations
 
-Currently, this server only handles a single bucket's contents up to 1000 elements, and cannot support "folders" within a bucket since those aren't really things anyway. This is designed to share a specific set of resources quickly.
+Currently, this server only handles a single bucket's contents up to 1000 elements.
+It supports "folders" within a bucket and can navigate them, but these count against the bucket size limit.
+This is designed to share a specific set of resources quickly.
 
 ## Requirements
 
@@ -74,8 +76,6 @@ Google authentication involves using only email addresses in the `acl.txt` file,
 Create the file `acl.txt` and place the emails of the people you want to allow. Add one email per line. Then place the file in the S3 bucket with the rest of the files.
 
 Register a new app with Google. Set up the credentials and make sure the callback URL points to `yourdomain.com/auth/google_oauth2/callback`.
-
-Add the Google+ API to this new app so the app can grab the data from Google.
 
 Create a `.env` file in the root of the app with the following contents:
 
@@ -204,6 +204,13 @@ napcs/s3server
 
 And you're good to go.
 
+Of course, you can use your `.env` file too:
+
+```
+docker run -d -p 9292:9292 --env-file=./.env --name s3server \
+napcs/s3server
+```
+
 
 Stop the container with
 
@@ -235,7 +242,7 @@ You can build your own image with
 docker build -t s3server .
 ```
 
-And just use that instead of the one from Docker Hub. 
+And use that instead of the one from Docker Hub.
 
 ## Support for DigitalOcean Spaces
 
@@ -262,14 +269,14 @@ Once the server is configured, start it and it'll use DigitalOcean Spaces as you
 
 ## Nginx as a Reverse Proxy
 
-You might not want to expose this to the web. And if you're gonna take passwords through it,, probably best to use HTTPS. 
+You might not want to expose this to the web. And if you're gonna take passwords through it,, probably best to use HTTPS.
 
-Nginx is a nice quick way to pull this off. 
+Nginx is a nice quick way to pull this off.
 
-Get an Ubuntu 16.04 server. Install Nginx on it with 
+Get an Ubuntu 24.04 server. Install Nginx on it with
 
 ```
-sudo apt-get install nginx
+sudo apt  install nginx
 ```
 
 Get yourself a domain name like `s3server.example.com` and point it at your box's IP address.
@@ -287,7 +294,7 @@ server {
 			include /etc/nginx/proxy_params;
 		}
 }
-``` 
+```
 
 Symlink it:
 
@@ -298,10 +305,18 @@ sudo ln -nfs /etc/nginx/sites-available/s3server.conf /etc/nginx/sites-enabled/s
 Then use Certbot to get a Let's Encrypt certificate for this and redirect all traffic from HTTP to HTTPS. Visit `https://s3server.example.com` and you're golden.
 
 ## Changelog
+* 2025-01-15 (0.8.0)
+  * Update dependencies to Ruby 3.2.6
+  * Update Puma and Oauth libraries
+  * Properly support "folders" in buckets. You can now show folders and drill down.
+  * Add quick download links to list page for each item.
+  * Remove table from show page and replace with paragraphs to improve mobile experience.
+  * Update Dockerfile to perform multistage build that shrinks the image size by 50%.
+
 * 2022-09-09 (0.7.0)
   * Upgrade Puma and Sinatra to address security issues.
   * Upgrade Oauth for Google and add proper login and no access screens.
-  * Add option to hide folders and only show the top folder of a bucket. 
+  * Add option to hide folders and only show the top folder of a bucket.
 
 * 2021-09-12 (0.6.2)
   * Directories are no longer shown in the UI. Only the actual files are displayed, but their paths are still shown.
@@ -343,5 +358,5 @@ Then use Certbot to get a Let's Encrypt certificate for this and redirect all tr
 
 ## License
 
-MIT. Copyright 2017 Brian P. Hogan.
+MIT. Copyright 2017-2025 Brian P. Hogan.
 

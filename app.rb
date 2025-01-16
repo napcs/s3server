@@ -1,5 +1,5 @@
 module S3Server
-  VERSION = "0.7.0"
+  VERSION = "0.8.0"
 
   require 'sinatra/base'
   require 'aws-sdk-s3'
@@ -41,20 +41,43 @@ module S3Server
     end
 
 
+    # root route
     get "/" do
       login_check
       s3 = get_s3_connection
-      @data = s3.get_all_objects({hide_folders: ENV["S3SERVER_HIDE_FOLDERS"]})
-
+      @folders, @files = s3.list("", {hide_folders: ENV["S3SERVER_HIDE_FOLDERS"] == "true"})
       erb :index
     end
 
+    # Single route that handles both folders and files
     get "/o/*" do
       login_check
-      key = params[:splat].first
-      s3 = get_s3_connection
-      @data = s3.get_object_data_by_key(key, ENV["S3_LINK_TIMEOUT"])
-      erb :show
+      s3  = get_s3_connection
+      key = params[:splat].first  # everything after '/o/'
+
+      # If user typed "/o/folder" without slash, check if it's a folder
+      if !key.end_with?("/") && s3.is_folder?(key)
+        # redirect to "/o/folder/" for consistency
+        redirect "/o/#{key}/"
+      end
+
+      if key.end_with?("/")
+        # It's a folder prefix; list what's inside
+        @folders, @files = s3.list(key)
+        erb :index
+      else
+        # It's a file; fetch details
+        @data = s3.get_object_data_by_key(key, ENV["S3_LINK_TIMEOUT"])
+        if @data
+          if params["dl"] == "1"
+            redirect @data[:url]
+          else
+            erb :show
+          end
+        else
+          halt 404, "File not found"
+        end
+      end
     end
 
     get "/fail" do
