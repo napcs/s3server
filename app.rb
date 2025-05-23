@@ -15,6 +15,10 @@ module S3Server
   class Server < Sinatra::Base
     configure do
       set :sessions, true if ENV["S3SERVER_LOGIN"] == "google"
+      # Cache S3 connection and environment variables
+      set :s3_connection, S3.new(ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"], ENV["S3_ENDPOINT"])
+      set :hide_folders, ENV["S3SERVER_HIDE_FOLDERS"] == "true"
+      set :link_timeout, ENV["S3_LINK_TIMEOUT"]
     end
 
     configure :development do
@@ -44,30 +48,28 @@ module S3Server
     # root route
     get "/" do
       login_check
-      s3 = get_s3_connection
-      @folders, @files = s3.list("", {hide_folders: ENV["S3SERVER_HIDE_FOLDERS"] == "true"})
+      @folders, @files = settings.s3_connection.list("", {hide_folders: settings.hide_folders})
       erb :index
     end
 
     # Single route that handles both folders and files
     get "/o/*" do
       login_check
-      s3  = get_s3_connection
       key = params[:splat].first  # everything after '/o/'
 
       # If user typed "/o/folder" without slash, check if it's a folder
-      if !key.end_with?("/") && s3.is_folder?(key)
+      if !key.end_with?("/") && settings.s3_connection.is_folder?(key)
         # redirect to "/o/folder/" for consistency
         redirect "/o/#{key}/"
       end
 
       if key.end_with?("/")
         # It's a folder prefix; list what's inside
-        @folders, @files = s3.list(key)
+        @folders, @files = settings.s3_connection.list(key)
         erb :index
       else
         # It's a file; fetch details
-        @data = s3.get_object_data_by_key(key, ENV["S3_LINK_TIMEOUT"])
+        @data = settings.s3_connection.get_object_data_by_key(key, settings.link_timeout)
         if @data
           if params["dl"] == "1"
             redirect @data[:url]
@@ -122,18 +124,12 @@ module S3Server
     end
 
 
-    def get_s3_connection
-      S3.new ENV["S3_ID"], ENV["S3_KEY"], ENV["S3_BUCKET"], ENV["S3_REGION"], ENV["S3_ENDPOINT"]
-    end
-
     def can_access_bucket?(email)
-      s3 = get_s3_connection
-      s3.can_read?(email)
+      settings.s3_connection.can_read?(email)
     end
 
     def can_access_bucket_with_password?(email, password)
-      s3 = get_s3_connection
-      s3.can_read_with_password?(email, password)
+      settings.s3_connection.can_read_with_password?(email, password)
     end
 
   end
