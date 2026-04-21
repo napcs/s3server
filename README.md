@@ -211,7 +211,6 @@ docker run -d -p 9292:9292 --env-file=./.env --name s3server \
 napcs/s3server
 ```
 
-
 Stop the container with
 
 ```
@@ -276,7 +275,7 @@ Nginx is a nice quick way to pull this off.
 Get an Ubuntu 24.04 server. Install Nginx on it with
 
 ```
-sudo apt  install nginx
+sudo apt install nginx
 ```
 
 Get yourself a domain name like `s3server.example.com` and point it at your box's IP address.
@@ -305,6 +304,10 @@ sudo ln -nfs /etc/nginx/sites-available/s3server.conf /etc/nginx/sites-enabled/s
 Then use Certbot to get a Let's Encrypt certificate for this and redirect all traffic from HTTP to HTTPS. Visit `https://s3server.example.com` and you're golden.
 
 ## Changelog
+* 2025-05-26 (0.9.0)
+  * Reworked authentication and connection logic to improve performance.
+  * Fix CSS issues in header and tables
+
 * 2025-01-15 (0.8.0)
   * Update dependencies to Ruby 3.2.6
   * Update Puma and Oauth libraries

@@ -16,7 +16,7 @@ body {
 header {
   background-color: #333;
   color: #fff;
-  height: 28px;
+  height: 38px;
   position: relative;
 }
 
@@ -58,14 +58,16 @@ table th {
   background-color: #ddd;
   line-height: 2em;
   text-align: left;
+}
+
+table th, table td {
   padding: 1em;
+  font-size: 1.5em;
 }
 
 table td {
   border-bottom: 1px solid #ddd;
-  padding: 1em 0;
   word-wrap:break-word;
-  font-size: 1.5em;
 }
 
 table td .link a {
